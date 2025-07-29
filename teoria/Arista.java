@@ -1,3 +1,4 @@
+package teoria;
 public class Arista{
   
   private int origen;

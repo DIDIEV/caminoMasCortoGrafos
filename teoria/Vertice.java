@@ -1,4 +1,4 @@
-
+package teoria;
 public class Vertice{
   private String nombre;
   private static int contador = 0;

@@ -1,7 +1,10 @@
+
+package teoria;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
+
 
 public class Grafo {
   private List<Vertice> vertices;
