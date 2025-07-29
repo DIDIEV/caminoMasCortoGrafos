@@ -1,5 +1,6 @@
 import java.util.List;
 import java.util.Scanner;
+import teoria.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -56,15 +57,17 @@ public class Main {
         // Buscar camino más corto
         System.out.println("\n=== BUSCAR CAMINO MÁS CORTO ===");
         System.out.print("Ingrese el ID del vértice origen: ");
-        int origenId = scanner.nextInt();
+        int origenId = 0;
+        origenId = scanner.nextInt();
         System.out.print("Ingrese el ID del vértice destino: ");
-        int destinoId = scanner.nextInt();
+        int destinoId = 0;
+        destinoId = scanner.nextInt();
+        scanner.nextLine();
 
-        if (origenId >= 0 && origenId < vertices.size() && 
+        if (origenId >= 0 && origenId < vertices.size() &&
             destinoId >= 0 && destinoId < vertices.size()) {
 
             Vertice origen = vertices.get(origenId);
-            scanner.nextLine();
             Vertice destino = vertices.get(destinoId);
             scanner.nextLine();
             // Establecer origen y destino globales
