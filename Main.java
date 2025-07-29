@@ -64,20 +64,20 @@ public class Main {
             destinoId >= 0 && destinoId < vertices.size()) {
 
             Vertice origen = vertices.get(origenId);
+            scanner.nextLine();
             Vertice destino = vertices.get(destinoId);
-
+            scanner.nextLine();
             // Establecer origen y destino globales
             grafo.setOrigenGlob(origen);
             grafo.setDestinoGlob(destino);
 
-            System.out.println("\nBuscando camino más corto de " + 
-                             origen.getNombre() + " a " + destino.getNombre() + "...");
+            System.out.println("\nBuscando camino más corto de " + origen.getNombre() + " a " + destino.getNombre() + "...");
 
-            List<Camino> caminos = grafo.caminoMasCorto(origen, destino, matriz);
+            //List<Camino> caminos = grafo.caminoMasCorto(origen, destino, matriz);
 
             // Mostrar resultados
-            mostrarResultados(caminos, vertices);
-
+            //mostrarResultados(caminos, vertices);
+            System.out.println(grafo.caminoMasCorto(origen, destino, matriz));
         } else {
             System.out.println("Error: IDs de vértices inválidos.");
         }
@@ -186,8 +186,9 @@ public class Main {
         grafo.setDestinoGlob(destino);
 
         System.out.println("Buscando camino más corto de A a E...");
-        List<Camino> caminos = grafo.caminoMasCorto(origen, destino, matriz);
-
-        mostrarResultados(caminos, vertices);
+        //List<Camino> caminos = grafo.caminoMasCorto(origen, destino, matriz);
+        System.out.println(grafo.caminoMasCorto(origen, destino, matriz));
+        
+        //mostrarResultados(caminos, vertices);
     }
 }

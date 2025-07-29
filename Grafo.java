@@ -1,5 +1,7 @@
 import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Grafo {
   private List<Vertice> vertices;
@@ -65,9 +67,14 @@ public class Grafo {
 
   
   public float[][] crearMatrizAdyacencia(List<Arista> aristas) {
-    float[][] matriz = new float[this.vertices.size()][this.vertices.size()];
+    int I = this.vertices.size();
+    int J = this.vertices.size();
+    float[][] matriz = new float[I][J];
     for (Arista arista : aristas) {
-      matriz[arista.getOrigen()][arista.getDestino()] = arista.getPeso();
+      int origen = arista.getOrigen();
+      int destino = arista.getDestino();
+      //System.out.println(Integer.toString(origen) + "," + Integer.toString(destino));
+      matriz[origen][destino] = arista.getPeso();
     }
     return matriz;
   }
@@ -149,131 +156,71 @@ public class Grafo {
   }
 
   // Algoritmo.
-  public List<Camino> caminoMasCorto(Vertice origen, Vertice destino, float[][] miMatriz) {
-    boolean hayCamino = false;
-    List<Camino> caminosContinuados = new ArrayList<Camino>();
-    List<Vertice> adOrigen = getAdyacentes(origen, miMatriz);
-    List<Vertice> insDestino = getInsidentes(destino, miMatriz);
+  public String caminoMasCorto(Vertice origen, Vertice destino, float[][] matriz) {
+      int n = this.vertices.size();
+      float[] distancias = new float[n];
+      Vertice[] anteriores = new Vertice[n];
+      boolean[] visitados = new boolean[n];
 
-    if (adOrigen.size() < insDestino.size()) {
-        for (Vertice v : adOrigen) {
-            if (v == destino) {
-                Camino camino = new Camino(miMatriz);
-                camino.addVertice(origen);
-                camino.addVertice(v);
-                camino.siTerminado();
-                condicionEspecialOrigen(origen, camino, caminosContinuados);
-                this.caminos.add(camino);
-                if (camino.isTerminado()) {
-                    hayCamino = true;
-                    if (this.pesoActual != 0) {
-                        if (camino.getPeso() <= pesoActual) {
-                            setPesoActual(camino.getPeso());
-                        } else {
-                            this.caminos.remove(camino);
-                        }
-                    } else {
-                        setPesoActual(camino.getPeso());
-                    }
-                }
-                continue;
-            } else {
-                if (this.pesoActual == 0) {
-                    Camino camino = new Camino(miMatriz);
-                    camino.addVertice(origen);
-                    camino.addVertice(v);
-                    condicionEspecialOrigen(origen, camino, caminosContinuados);
-                    this.caminos.add(camino);
-                } else {
-                    Camino camino = new Camino(miMatriz);
-                    camino.addVertice(origen);
-                    camino.addVertice(v);
-                    condicionEspecialOrigen(origen, camino, caminosContinuados);
-                    if (camino.getPeso() <= pesoActual) {
-                        this.caminos.add(camino);
-                    } else {
-                        this.caminos.remove(camino);
-                    }
-                }
-            }
-        }
+      // Inicialización
+      for (int i = 0; i < n; i++) {
+          distancias[i] = Float.MAX_VALUE;
+          anteriores[i] = null;
+          visitados[i] = false;
+      }
 
-        //Recursividad
-        do {
-            for (Camino camino : new ArrayList<>(this.caminos)) {
-                if (camino.isTerminado()) {
-                    continue;
-                }
-                Vertice ultimoVertice = camino.getCamino().get(camino.getCamino().size() - 1);
-                caminoMasCorto(ultimoVertice, this.destino, miMatriz);
-            }
-        } while (!todosLosCaminosTerminados());
+      int distanciaOrigen = origen.getId();
+      System.out.println(distanciaOrigen);
+      distancias[distanciaOrigen] = 0;
 
-    } else {
-        for (Vertice v : insDestino) {
-            if (v == origen) {
-                Camino camino = new Camino(miMatriz);
-                camino.addVertice(v);
-                camino.addVertice(destino);
-                camino.siTerminado();
-                condicionEspecialDestino(destino, camino, caminosContinuados);
-                this.caminos.add(camino);
-                if (camino.isTerminado()) {
-                    hayCamino = true;
-                    if (this.pesoActual != 0) {
-                        if (camino.getPeso() <= pesoActual) {
-                            setPesoActual(camino.getPeso());
-                        } else {
-                            this.caminos.remove(camino);
-                        }
-                    } else {
-                        setPesoActual(camino.getPeso());
-                    }
-                }
-                continue;
-            } else {
-                if (this.pesoActual == 0) {
-                    Camino camino = new Camino(miMatriz);
-                    camino.addVertice(v);
-                    camino.addVertice(destino);
-                    condicionEspecialDestino(destino, camino, caminosContinuados);
-                    this.caminos.add(camino);
-                } else {
-                    Camino camino = new Camino(miMatriz);
-                    camino.addVertice(v);
-                    camino.addVertice(destino);
-                    condicionEspecialDestino(destino, camino, caminosContinuados);
-                    if (camino.getPeso() <= pesoActual) {
-                        this.caminos.add(camino);
-                    } else {
-                        this.caminos.remove(camino);
-                    }
-                }
-            }
-        }
+      for (int i = 0; i < n; i++) {
+          // Buscar el vértice no visitado con menor distancia
+          int u = -1;
+          float minDist = Float.MAX_VALUE;
+          for (int j = 0; j < n; j++) {
+              if (!visitados[j] && distancias[j] < minDist) {
+                  minDist = distancias[j];
+                  u = j;
+              }
+          }
 
-        //Recursividad
-        do {
-            for (Camino camino : new ArrayList<>(this.caminos)) {
-                if (camino.isTerminado()) {
-                    continue;
-                }
-                Vertice primerVertice = camino.getCamino().get(0);
-                caminoMasCorto(this.origen, primerVertice, miMatriz);
-            }
-        } while (!todosLosCaminosTerminados());
-    }
+          if (u == -1) break; // No hay más vértices alcanzables
 
-    return this.caminos;
+          visitados[u] = true;
+
+          // Actualizar distancias de los vecinos
+          for (int v = 0; v < n; v++) {
+              float pesoUV = matriz[u][v];
+              if (pesoUV > 0 && !visitados[v]) {
+                  float nuevaDistancia = distancias[u] + pesoUV;
+                  if (nuevaDistancia < distancias[v]) {
+                      distancias[v] = nuevaDistancia;
+                      anteriores[v] = this.vertices.get(u);
+                  }
+              }
+          }
+      }
+
+      // Reconstruir camino como String
+      LinkedList<Vertice> camino = new LinkedList<>();
+      for (Vertice at = destino; at != null; at = anteriores[at.getId()]) {
+          camino.addFirst(at);
+      }
+
+      if (camino.isEmpty() || !camino.getFirst().equals(origen)) {
+          return "No hay camino entre " + origen.getNombre() + " y " + destino.getNombre();
+      }
+
+      StringBuilder resultado = new StringBuilder();
+      for (int i = 0; i < camino.size(); i++) {
+          resultado.append(camino.get(i).getNombre());
+          if (i != camino.size() - 1) {
+              resultado.append(" -> ");
+          }
+      }
+
+      resultado.append(" (Costo total: ").append(distancias[destino.getId()]).append(")");
+      return resultado.toString();
   }
 
-  // Método auxiliar para verificar si todos los caminos están terminados
-  private boolean todosLosCaminosTerminados() {
-    for (Camino camino : this.caminos) {
-        if (!camino.isTerminado()) {
-            return false;
-        }
-    }
-    return true;
-  }
 }
