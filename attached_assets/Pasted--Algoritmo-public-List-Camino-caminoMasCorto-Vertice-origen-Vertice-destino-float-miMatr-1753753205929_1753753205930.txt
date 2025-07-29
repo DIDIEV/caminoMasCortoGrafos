@@ -1,0 +1,118 @@
+// Algoritmo.
+  public List<Camino> caminoMasCorto(Vertice origen, Vertice destino, float[][] miMatriz) {
+    boolean hayCamino = false;
+    List<Camino> caminosContinuados = new ArrayList<Camino>();
+    List<Vertice> adOrigen = getAdyacentes(origen, miMatriz);
+    List<Vertice> insDestino = getInsidentes(destino, miMatriz);
+
+    if (adOrigen.size() < insDestino.size()) {
+        for (Vertice v : adOrigen) {
+            if (v == destino) {
+                Camino camino = new Camino(miMatriz);
+                camino.addVertice(origen);
+                camino.addVertice(v);
+                camino.siTerminado();
+                condicionEspecialOrigen(origen, camino, caminosContinuados);
+                this.caminos.add(camino);
+                if (camino.isTerminado()) {
+                    hayCamino = true;
+                    if (this.pesoActual != 0) {
+                        if (camino.getPeso() <= pesoActual) {
+                            setPesoActual(camino.getPeso());
+                        } else {
+                            this.caminos.remove(camino);
+                        }
+                    } else {
+                        setPesoActual(camino.getPeso());
+                    }
+                }
+                continue;
+            } else {
+                if (this.pesoActual == 0) {
+                    Camino camino = new Camino(miMatriz);
+                    camino.addVertice(origen);
+                    camino.addVertice(v);
+                    condicionEspecialOrigen(origen, camino, caminosContinuados);
+                    this.caminos.add(camino);
+                } else {
+                    Camino camino = new Camino(miMatriz);
+                    camino.addVertice(origen);
+                    camino.addVertice(v);
+                    condicionEspecialOrigen(origen, camino, caminosContinuados);
+                    if (camino.getPeso() <= pesoActual) {
+                        this.caminos.add(camino);
+                    } else {
+                        this.caminos.remove(camino);
+                    }
+                }
+            }
+        }
+
+        //Recursividad
+        do {
+            for (Camino camino : new ArrayList<>(this.caminos)) {
+                if (camino.isTerminado()) {
+                    continue;
+                }
+                Vertice ultimoVertice = camino.getCamino().get(camino.getCamino().size() - 1);
+                caminoMasCorto(ultimoVertice, this.destino, miMatriz);
+            }
+        } while (!todosLosCaminosTerminados());
+
+    } else {
+        for (Vertice v : insDestino) {
+            if (v == origen) {
+                Camino camino = new Camino(miMatriz);
+                camino.addVertice(v);
+                camino.addVertice(destino);
+                camino.siTerminado();
+                condicionEspecialDestino(destino, camino, caminosContinuados);
+                this.caminos.add(camino);
+                if (camino.isTerminado()) {
+                    hayCamino = true;
+                    if (this.pesoActual != 0) {
+                        if (camino.getPeso() <= pesoActual) {
+                            setPesoActual(camino.getPeso());
+                        } else {
+                            this.caminos.remove(camino);
+                        }
+                    } else {
+                        setPesoActual(camino.getPeso());
+                    }
+                }
+                continue;
+            } else {
+                if (this.pesoActual == 0) {
+                    Camino camino = new Camino(miMatriz);
+                    camino.addVertice(v);
+                    camino.addVertice(destino);
+                    condicionEspecialDestino(destino, camino, caminosContinuados);
+                    this.caminos.add(camino);
+                } else {
+                    Camino camino = new Camino(miMatriz);
+                    camino.addVertice(v);
+                    camino.addVertice(destino);
+                    condicionEspecialDestino(destino, camino, caminosContinuados);
+                    if (camino.getPeso() <= pesoActual) {
+                        this.caminos.add(camino);
+                    } else {
+                        this.caminos.remove(camino);
+                    }
+                }
+            }
+        }
+
+        //Recursividad
+        do {
+            for (Camino camino : new ArrayList<>(this.caminos)) {
+                if (camino.isTerminado()) {
+                    continue;
+                }
+                Vertice primerVertice = camino.getCamino().get(0);
+                caminoMasCorto(this.origen, primerVertice, miMatriz);
+            }
+        } while (!todosLosCaminosTerminados());
+    }
+
+    return this.caminos;
+  }
